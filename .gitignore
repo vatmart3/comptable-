@@ -10,3 +10,6 @@ scripts/.fontcache
 
 # Artefacts de compilation TypeScript
 *.tsbuildinfo
+
+# Build « page autonome » (npm run single)
+dist-single

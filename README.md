@@ -27,6 +27,17 @@ le site n'appelle rien au-delà de son propre domaine.
 | `npm run build` | vérification TypeScript puis build de production dans `dist/` |
 | `npm run preview` | sert le build de production |
 | `npm run og` | régénère `public/og.png` à partir du modèle de calcul |
+| `npm run single` | assemble tout le site en une page autonome (`dist-single/page.html`) |
+
+### Voir le site sans rien installer
+
+`npm run single` produit `dist-single/page.html` : le site entier dans un seul fichier, styles,
+script et polices inclus en `data:` URI. Aucune requête réseau, il s'ouvre par double-clic ou se
+dépose sur n'importe quel hébergeur statique.
+
+C'est une variante de *démonstration*, pas la version de production : elle désactive le découpage
+en chunks, donc la scène 3D n'est plus chargée en différé après le premier paint. Pour un
+hébergement réel, `npm run build` et servez `dist/`.
 
 ---
 

@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit false --emitDeclarationOnly false",
-    "og": "node --experimental-strip-types --no-warnings scripts/build-og.mjs"
+    "og": "node --experimental-strip-types --no-warnings scripts/build-og.mjs",
+    "single": "vite build --config vite.single.config.ts && node scripts/build-singlefile.mjs"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
