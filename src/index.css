@@ -1,0 +1,362 @@
+@import 'tailwindcss';
+
+/* Trois polices, trois rôles. Aucune police par défaut du système n'est utilisée
+   comme choix — seulement en repli le temps du swap.
+   Bricolage : fichier « standard », c'est celui qui porte les trois axes
+   (opsz 12→96, wdth 75→100, wght 200→800). L'axe opsz est réellement piloté. */
+@import '@fontsource-variable/bricolage-grotesque/standard.css';
+@import '@fontsource-variable/public-sans/wght.css';
+@import '@fontsource-variable/martian-mono/wght.css';
+
+@theme {
+  /* On repart de zéro : aucune couleur Tailwind par défaut n'existe dans ce projet.
+     `bg-slate-500` ou `text-gray-700` ne compilent tout simplement pas. */
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --color-paper: #e9ede6; /* fond principal — vert-gris de papier réglé */
+  --color-paper-hi: #f7f8f5; /* surfaces surélevées */
+  --color-ink: #14201b; /* texte et structure */
+  --color-stamp: #23347a; /* encre de tampon — CTA uniquement */
+  --color-debit: #a83a2c; /* rouge de report — montants au débit uniquement */
+  --color-rule: #c3ccbe; /* filets */
+
+  /* Filets sur fond encre : le même filet, calculé, jamais une couleur en plus. */
+  --color-rule-ink: color-mix(in oklab, var(--color-paper) 26%, var(--color-ink));
+
+  --font-display: 'Bricolage Grotesque Variable', ui-sans-serif, sans-serif;
+  --font-sans: 'Public Sans Variable', ui-sans-serif, sans-serif;
+  --font-mono: 'Martian Mono Variable', ui-monospace, monospace;
+
+  /* Rayon nul partout. La seule exception est déclarée, et une seule fois. */
+  --radius-*: initial;
+  --radius-field: 2px;
+
+  --ease-ledger: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --focus: var(--color-stamp);
+    /* Largeur réellement occupée par le rail. Le contenu s'y adapte,
+       il n'est jamais recouvert. Mise à jour par le composant Ledger. */
+    --rail: 0px;
+  }
+
+  * {
+    border-color: var(--color-rule);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto; /* le scroll amorti est géré par Lenis, pas par le navigateur */
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-optical-sizing: auto;
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* Un chiffre ne danse jamais. Règle appliquée au document entier. */
+  body,
+  input,
+  button,
+  select,
+  textarea {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-stamp);
+    color: var(--color-paper-hi);
+  }
+
+  /* Focus clavier : ni l'outline par défaut, ni `outline: none`.
+     Un double trait, comme une marque de repérage sur un document. */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 1px var(--color-paper);
+  }
+
+  [data-surface='ink'] {
+    --focus: var(--color-paper);
+  }
+  [data-surface='ink'] :focus-visible {
+    box-shadow: 0 0 0 1px var(--color-ink);
+  }
+
+  /* Le grain : une seule texture, statique, non animée. Elle donne au fond
+     la matière d'un papier imprimé sans jamais coûter une image. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @media print {
+    body::after {
+      display: none;
+    }
+  }
+}
+
+@layer components {
+  /* ── Rôles typographiques ────────────────────────────────────────────── */
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .folio {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* L'axe opsz de Bricolage est piloté à la main : plus le titre est grand,
+     plus le dessin se resserre. C'est tout l'intérêt d'une variable font. */
+  .display-xl {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 96, 'wght' 500, 'wdth' 96;
+    font-size: clamp(2.25rem, 6.2vw, 5.5rem);
+    line-height: 0.94;
+    letter-spacing: -0.035em;
+  }
+
+  .display-lg {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 64, 'wght' 500, 'wdth' 98;
+    font-size: clamp(1.75rem, 3.6vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.028em;
+  }
+
+  .display-md {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 28, 'wght' 550, 'wdth' 100;
+    font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+    line-height: 1.2;
+    letter-spacing: -0.018em;
+  }
+
+  .display-sm {
+    font-family: var(--font-display);
+    font-variation-settings: 'opsz' 14, 'wght' 600, 'wdth' 100;
+    font-size: 1rem;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+  }
+
+  .lede {
+    font-size: clamp(1.0625rem, 1.35vw, 1.3125rem);
+    line-height: 1.5;
+    max-width: 46ch;
+  }
+
+  .prose-line {
+    font-size: 1rem;
+    line-height: 1.65;
+    max-width: 62ch;
+  }
+
+  /* ── Structure de registre ───────────────────────────────────────────── */
+
+  /* La grille du site. Le contenu ne se centre pas : il s'aligne sur une
+     colonne de libellé à gauche, les montants tombent à droite. */
+  .sheet {
+    width: 100%;
+    max-width: 108rem;
+    margin-inline: auto;
+    padding-inline: clamp(1.125rem, 4vw, 4.5rem);
+  }
+
+  .rule-t {
+    border-top: 1px solid var(--color-rule);
+  }
+  .rule-b {
+    border-bottom: 1px solid var(--color-rule);
+  }
+  [data-surface='ink'] .rule-t {
+    border-top-color: var(--color-rule-ink);
+  }
+  [data-surface='ink'] .rule-b {
+    border-bottom-color: var(--color-rule-ink);
+  }
+
+  /* Le trait de clôture : double filet, comme au bas d'un compte soldé. */
+  .rule-close {
+    border-top: 1px solid var(--color-ink);
+    box-shadow: 0 3px 0 -1px var(--color-ink);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--color-stamp);
+    color: var(--color-paper-hi);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 1.0625rem 1.75rem;
+    border: 0;
+    cursor: pointer;
+    transition:
+      background-color 0.25s var(--ease-ledger),
+      transform 0.25s var(--ease-ledger);
+  }
+  .btn:hover {
+    background: color-mix(in oklab, var(--color-stamp) 86%, var(--color-ink));
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn[disabled] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Le seul rayon du site : 2 px, sur ce qu'on touche. */
+  .field {
+    width: 100%;
+    background: var(--color-paper-hi);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-field);
+    padding: 0.875rem 1rem;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    color: var(--color-ink);
+    transition: border-color 0.2s var(--ease-ledger);
+  }
+  .field::placeholder {
+    /* 64 % : premier palier qui tient le contraste AA sur --paper-hi. */
+    color: color-mix(in oklab, var(--color-ink) 64%, var(--color-paper));
+  }
+  .field:hover {
+    border-color: color-mix(in oklab, var(--color-rule) 55%, var(--color-ink));
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: color-mix(in oklab, var(--color-ink) 78%, var(--color-paper));
+  }
+}
+
+/* Une écriture arrive comme on pose une ligne : depuis la droite, sans rebond. */
+@keyframes ledger-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* La ligne en attente respire très lentement. C'est le seul élément du site
+   qui bouge en boucle, et c'est délibéré : il signale un document inachevé. */
+@keyframes pending-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Le tracé de fil de fer, pendant le chargement de la scène. */
+@keyframes draw-in {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Le trait de clôture, une fois l'écriture soldée. */
+@keyframes close-rule {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@layer utilities {
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Le contenu réserve la place du rail ET conserve sa gouttière : sans le
+     second terme, les montants de droite venaient buter contre le filet. */
+  .pad-rail {
+    padding-right: calc(var(--rail) + clamp(1.125rem, 4vw, 4.5rem));
+  }
+
+  .no-cursor {
+    cursor: none;
+  }
+}
+
+/* ── prefers-reduced-motion ────────────────────────────────────────────────
+   Le site reste entièrement compréhensible sans une seule animation :
+   toutes les sections sont visibles, le grand livre est écrit d'emblée,
+   la balance s'affiche à l'équilibre. Rien n'est caché derrière un mouvement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

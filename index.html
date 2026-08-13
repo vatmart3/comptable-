@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#E9EDE6" />
+
+    <!--
+      Ces trois balises sont la copie statique de `meta` dans src/config/site.ts,
+      pour que le titre soit correct avant même l'exécution du JavaScript.
+      Elles sont resynchronisées au montage par <Head />. En cas de rebranding,
+      modifiez src/config/site.ts puis recopiez ici. (README § Rebranding, point 4.)
+    -->
+    <title>Expert-comptable à Sète — Cabinet Ferrand &amp; Solère</title>
+    <meta
+      name="description"
+      content="Cabinet d'expertise comptable à Sète. Tenue, bilan, TVA, paie et pilotage pour TPE, restaurateurs, artisans, viticulteurs et professions libérales. Bassin de Thau et Montpellier. Premier rendez-vous sans engagement."
+    />
+    <link rel="canonical" href="https://ferrand-solere.fr/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Cabinet Ferrand &amp; Solère" />
+    <meta property="og:title" content="Expert-comptable à Sète — Cabinet Ferrand &amp; Solère" />
+    <meta
+      property="og:description"
+      content="Ce que le désordre comptable coûte à une TPE, chiffré. Puis ce qu'un cabinet peut en récupérer. Sète, Bassin de Thau, Montpellier."
+    />
+    <meta property="og:image" content="/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <noscript>
+      <p style="padding: 2rem; font-family: sans-serif">
+        Ce site utilise JavaScript pour la simulation et le grand livre. Le cabinet Ferrand &amp;
+        Solère reste joignable au 04 67 00 00 00.
+      </p>
+    </noscript>
+  </body>
+</html>

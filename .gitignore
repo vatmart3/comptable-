@@ -1,0 +1,12 @@
+node_modules
+dist
+.DS_Store
+*.local
+.vite
+
+# Générés par scripts/build-og.mjs
+scripts/.fonts.conf
+scripts/.fontcache
+
+# Artefacts de compilation TypeScript
+*.tsbuildinfo

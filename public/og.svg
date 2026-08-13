@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#E9EDE6"/>
+
+  <line x1="64" y1="88" x2="1136" y2="88" stroke="#14201B" stroke-width="1.5"/>
+  <text x="64" y="72" font-family="MartianOG" font-size="16" letter-spacing="2.2" fill="#14201B">CABINET FERRAND &amp; SOLÈRE · EXPERTS-COMPTABLES · SÈTE</text>
+
+  
+  <g stroke="#14201B" stroke-width="2.5" fill="none" stroke-linecap="round">
+    <path d="M 780 300 h 300"/>
+    <path d="M 930 300 v 150"/>
+    <path d="M 868 450 h 124"/>
+    <path d="M 930 300 v -46" stroke="#23347A" stroke-width="4"/>
+    <path d="M 780 300 l -46 74 h 92 z" fill="#F7F8F5"/>
+    <path d="M 1080 300 l -46 74 h 92 z" fill="#F7F8F5"/>
+    <circle cx="930" cy="300" r="9" fill="#C3CCBE"/>
+  </g>
+
+  <text x="64" y="205" font-family="BricolageOG" font-size="78" fill="#14201B">Ce que le désordre</text>
+  <text x="64" y="283" font-family="BricolageOG" font-size="78" fill="#14201B">vous coûte.</text>
+
+  <line x1="64" y1="325" x2="588" y2="325" stroke="#14201B" stroke-width="1.5"/>
+  <text x="64" y="348" font-family="MartianOG" font-size="14" letter-spacing="2" fill="#14201B" opacity="0.55">DÉBIT · PROFIL DE RÉFÉRENCE</text>
+
+  
+    <text x="64" y="382" font-family="MartianOG" font-size="17" fill="#14201B" opacity="0.55">31/01</text>
+    <text x="138" y="382" font-family="MartianOG" font-size="18" fill="#14201B">Temps de gestion</text>
+    <text x="588" y="382" font-family="MartianOG" font-size="19" fill="#A83A2C" text-anchor="end">3 780 €</text>
+    <line x1="64" y1="397" x2="588" y2="397" stroke="#C3CCBE" stroke-width="1"/>
+    <text x="64" y="428" font-family="MartianOG" font-size="17" fill="#14201B" opacity="0.55">28/02</text>
+    <text x="138" y="428" font-family="MartianOG" font-size="18" fill="#14201B">Déductions non réclamées</text>
+    <text x="588" y="428" font-family="MartianOG" font-size="19" fill="#A83A2C" text-anchor="end">1 890 €</text>
+    <line x1="64" y1="443" x2="588" y2="443" stroke="#C3CCBE" stroke-width="1"/>
+    <text x="64" y="474" font-family="MartianOG" font-size="17" fill="#14201B" opacity="0.55">15/03</text>
+    <text x="138" y="474" font-family="MartianOG" font-size="18" fill="#14201B">Majorations et intérêts</text>
+    <text x="588" y="474" font-family="MartianOG" font-size="19" fill="#A83A2C" text-anchor="end">740 €</text>
+    <line x1="64" y1="489" x2="588" y2="489" stroke="#C3CCBE" stroke-width="1"/>
+
+  <line x1="64" y1="546" x2="588" y2="546" stroke="#14201B" stroke-width="1.5"/>
+  <line x1="64" y1="550" x2="588" y2="550" stroke="#14201B" stroke-width="1.5"/>
+  <text x="64" y="582" font-family="MartianOG" font-size="15" letter-spacing="1.6" fill="#14201B" opacity="0.6">SOLDE APRÈS INTERVENTION</text>
+  <text x="588" y="582" font-family="MartianOG" font-size="26" fill="#23347A" text-anchor="end">+1 182 €</text>
+  <text x="64" y="608" font-family="MartianOG" font-size="14" fill="#14201B" opacity="0.5">et 71 heures rendues par an</text>
+</svg>
