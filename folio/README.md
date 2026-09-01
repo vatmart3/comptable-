@@ -29,7 +29,7 @@ src/engine/
                  dates.ts     exercice, base 30/360, prorata
   types/         dossier, compte, journal, écriture, pièce, entraînement
   referentiel/   plan comptable PCG du BTS CG, journaux, taux de TVA
-  controles/     codes.ts     41 codes d'écart typés
+  controles/     codes.ts     39 codes d'écart typés
                  catalogue.ts gravité et explication déterministe de chacun
                  structure, sens, tva, montants, inventaire, global
                  diagnostic.ts  comparaison saisie / attendu
@@ -65,7 +65,7 @@ Les deux renvoient des `Ecart` :
 
 Le `code` est la clé du produit : il alimente le diagnostic, l'entraînement
 ciblé et le tableau de progression. Il n'y a pas de message générique — un test
-vérifie que chacun des 41 codes est produit par un cas réel et qu'aucune
+vérifie que chacun des 39 codes est produit par un cas réel et qu'aucune
 explication ne contient de trou.
 
 ## Contrôles couverts
