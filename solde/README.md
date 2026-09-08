@@ -13,7 +13,7 @@ comprendre ses chiffres sans savoir lire une balance.
 | Phase | Contenu | État |
 |---|---|---|
 | **P0** | Setup, schéma Prisma, design tokens, PCG seedé, moteur comptable + tests | **livrée** |
-| P1 | La Ligne + La Balance : saisie, validation, chaînage, journaux | à venir |
+| **P1** | La Ligne + La Balance : saisie, validation, chaînage, journaux | **livrée** |
 | P2 | Le Fil : grand livre, balance, filtres, zoom sémantique | à venir |
 | P3 | Banque : imports, Lettrage Magnétique, rapprochement | à venir |
 | P4 | Facturation, TVA, immobilisations | à venir |
@@ -34,19 +34,25 @@ npm run dev
 Tests et contrôles :
 
 ```bash
-npm test              # 197 tests sur le moteur comptable
+npm test              # 287 tests : moteur comptable, parseur, service, démo
 npm run typecheck     # TypeScript strict, zéro any
 npm run solde:verify  # intégrité du registre : chaîne, séquences, balance
+npm run demo:etats    # vraisemblance comptable du seed de démonstration
 ```
+
+Les tests d'intégration (`tests/entries.integration.test.ts`) tournent sur une
+vraie base et se désactivent seuls si `DATABASE_URL` n'est pas joignable.
 
 ## Architecture
 
 ```
 lib/accounting/   moteur comptable pur — aucune dépendance React, Next ou Prisma
+lib/server/       services qui touchent la base : contexte, écritures
 lib/db.ts         client Prisma
-app/              routes App Router
-prisma/           schéma, données du PCG, seed
-tests/            Vitest, un fichier par module du moteur
+app/              routes App Router + server actions
+components/       balance/ (3D et dessinée), saisie/ (La Ligne), palette/ (⌘K)
+prisma/           schéma, données du PCG, générateur de démo, seed
+tests/            Vitest, un fichier par module + intégration
 scripts/verify.ts commande d'intégrité
 ```
 
@@ -93,6 +99,39 @@ Et deux conventions qui évitent les erreurs silencieuses :
 | `fec` | export 18 champs conforme, audit du fichier produit |
 | `anomalies` | radar : doublons, TVA incohérente, week-end, 471, séquence, montants aberrants |
 | `roles` | matrice lecture / saisie / réviseur / expert |
+| `ligne` | analyse d'une saisie en langage naturel — déterministe, hors ligne |
+
+## La saisie
+
+`/saisie` porte les deux premières signatures du § 7.
+
+**La Ligne** analyse une phrase française et en tire une écriture. L'analyse est
+déterministe et tourne dans le navigateur : elle fonctionne sans réseau, comme
+l'exige le § 2, et son résultat est prévisible — une grammaire s'apprend, un
+modèle se devine. La couche IA du § 5.1 viendra en Phase 5 se brancher en aval,
+sur les seules phrases que cette grammaire n'a pas su lire.
+
+Les puces n'éditent pas des lignes comptables : elles éditent un *brouillon*
+(sens, date, montant, compte, taux, journal, tiers), dont les lignes se
+déduisent. Une écriture sortie de La Ligne est donc équilibrée par construction.
+
+**La Balance** pèse ce qui est déjà connu. Un montant sans imputation charge un
+plateau et laisse l'autre vide : elle penche à fond, et la validation reste
+fermée. Dès que le compte arrive, les deux plateaux s'égalisent, elle se pose,
+le témoin passe au vert. Aucun message d'erreur n'accompagne le déséquilibre —
+on le voit. Sous `prefers-reduced-motion`, la même balance est dessinée en SVG,
+figée à la même inclinaison.
+
+### Ce que le service garantit
+
+Un brouillon n'a **pas** de numéro : lui en donner un, puis le supprimer,
+creuserait un trou dans la séquence — donc une présomption de suppression
+d'écriture. Le numéro est attribué à la validation.
+
+Numérotation et chaînage sont deux compteurs partagés. La validation prend donc
+un verrou consultatif PostgreSQL sur la société, en tête de transaction. Le test
+d'intégration valide six écritures en parallèle et vérifie qu'aucun numéro ni
+aucun maillon n'est attribué deux fois.
 
 ## Direction artistique
 

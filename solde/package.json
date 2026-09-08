@@ -13,7 +13,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "solde:verify": "tsx scripts/verify.ts"
+    "solde:verify": "tsx scripts/verify.ts",
+    "demo:etats": "tsx scripts/etats-demo.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",

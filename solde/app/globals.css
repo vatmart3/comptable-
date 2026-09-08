@@ -159,6 +159,24 @@
 }
 
 @layer components {
+  /* La Ligne n'est pas un champ de formulaire : son focus se marque par le
+     filet qui la souligne, pas par un contour dessiné autour d'elle. */
+  .champ-ligne:focus-visible {
+    box-shadow: none;
+    outline: none;
+  }
+
+  .filet-ligne {
+    height: 1px;
+    background-color: var(--c-trait);
+    transition: background-color var(--duree-court), height var(--duree-court);
+  }
+
+  .champ-ligne:focus-visible + .filet-ligne {
+    height: 2px;
+    background-color: var(--c-accent);
+  }
+
   /* Une carte se distingue par un filet, pas par une ombre molle. */
   .carte {
     background-color: var(--c-papier-haut);

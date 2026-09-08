@@ -37,7 +37,9 @@ async function main(): Promise<void> {
 
     const chainees: ChainedEntry[] = entries.map((entry) => ({
       journalCode: entry.journal.code,
-      numero: entry.numero,
+      // Une écriture validée porte toujours un numéro ; 0 le rendrait visible
+      // comme discontinuité plutôt que de masquer l'anomalie.
+      numero: entry.numero ?? 0,
       date: entry.date,
       libelle: entry.libelle,
       pieceRef: entry.pieceRef,
@@ -70,7 +72,7 @@ async function main(): Promise<void> {
         fiscalYearId: entry.fiscalYearId,
         numeros: [],
       }
-      bucket.numeros.push(entry.numero)
+      bucket.numeros.push(entry.numero ?? 0)
       sequences.set(key, bucket)
     }
     let problemesSequence = 0

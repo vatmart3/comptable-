@@ -246,7 +246,11 @@ model Entry {
   companyId     String
   fiscalYearId  String
   journalId     String
-  numero        Int
+  /// Null tant que l'écriture est au brouillon : un brouillon n'a pas encore de
+  /// numéro légal. Numéroter à la création puis supprimer le brouillon
+  /// creuserait un trou dans la séquence — donc une présomption de suppression
+  /// d'écriture. Le numéro est attribué au moment de la validation, sous verrou.
+  numero        Int?
   date          DateTime
   libelle       String
   pieceRef      String?

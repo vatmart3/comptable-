@@ -1,16 +1,22 @@
 /**
- * Seed — Phase 0.
+ * Seed — société de démonstration.
  *
  * Crée l'espace d'une société fictive, son plan comptable complet, ses
- * journaux et ses exercices. Les douze mois d'écritures crédibles annoncés
- * au § 9 arriveront avec la Phase 1 : ils doivent passer par le service de
- * validation (équilibre, séquence, chaînage), qui n'existe pas encore. Insérer
- * des écritures « à la main » ici produirait un registre non chaîné, donc faux.
+ * journaux, ses exercices, puis douze mois d'écritures crédibles.
+ *
+ * Ces écritures passent par le SERVICE de validation, une par une, exactement
+ * comme une saisie humaine : contrôle d'équilibre, numérotation continue,
+ * chaînage cryptographique. Les insérer directement en base irait cent fois
+ * plus vite et produirait un registre non chaîné — donc un registre faux, que
+ * `npm run solde:verify` rejetterait aussitôt.
  */
 
 import { PrismaClient } from '@prisma/client'
 import { JOURNAUX, PCG } from './data/pcg'
+import { genererDemo } from './data/demo'
 import { accountClass, accountNature, isLettrable, naturalSide } from '../lib/accounting/account'
+import { creerBrouillon, validerEcriture } from '../lib/server/entries'
+import type { Contexte } from '../lib/server/context'
 
 const db = new PrismaClient()
 
@@ -38,8 +44,12 @@ async function main(): Promise<void> {
     },
   })
 
+  // L'exercice ouvert est l'année en cours : une démo doit vivre dans le
+  // présent, sinon « hier » tombe hors exercice et rien ne se valide.
+  const anneeCourante = new Date().getUTCFullYear()
+
   console.log('→ Exercices')
-  for (const annee of [2024, 2025]) {
+  for (const annee of [anneeCourante - 1, anneeCourante]) {
     await db.fiscalYear.upsert({
       where: { companyId_dateDebut: { companyId: company.id, dateDebut: new Date(Date.UTC(annee, 0, 1)) } },
       update: {},
@@ -48,9 +58,9 @@ async function main(): Promise<void> {
         libelle: `Exercice ${annee}`,
         dateDebut: new Date(Date.UTC(annee, 0, 1)),
         dateFin: new Date(Date.UTC(annee, 11, 31)),
-        statut: annee === 2025 ? 'ouvert' : 'cloture',
-        reportANouveauGenere: annee === 2024,
-        clotureLe: annee === 2024 ? new Date(Date.UTC(2025, 3, 30)) : null,
+        statut: annee === anneeCourante ? 'ouvert' : 'cloture',
+        reportANouveauGenere: annee < anneeCourante,
+        clotureLe: annee < anneeCourante ? new Date(Date.UTC(anneeCourante, 3, 30)) : null,
       },
     })
   }
@@ -188,8 +198,60 @@ async function main(): Promise<void> {
     })
   }
 
+  // ── Douze mois d'écritures, validées par le service ─────────────────────
+  const exerciceCourant = await db.fiscalYear.findFirstOrThrow({
+    where: { companyId: company.id, statut: 'ouvert' },
+  })
+  const dejaSaisi = await db.entry.count({ where: { fiscalYearId: exerciceCourant.id } })
+
+  if (dejaSaisi > 0) {
+    console.log(`→ Écritures : ${dejaSaisi} déjà présentes, génération ignorée`)
+  } else {
+    const expert = await db.membership.findFirstOrThrow({
+      where: { companyId: company.id, role: 'expert' },
+      include: { user: true },
+    })
+    const contexte: Contexte = {
+      companyId: company.id,
+      companyNom: company.nom,
+      siren: company.siren,
+      fiscalYearId: exerciceCourant.id,
+      exercice: {
+        dateDebut: exerciceCourant.dateDebut,
+        dateFin: exerciceCourant.dateFin,
+        statut: 'ouvert',
+      },
+      acteur: {
+        userId: expert.user.id,
+        nom: expert.user.name,
+        email: expert.user.email,
+        role: 'expert',
+      },
+    }
+
+    const ecritures = genererDemo(exerciceCourant.dateDebut.getUTCFullYear(), new Date())
+    console.log(`→ Écritures (${ecritures.length}, validées et chaînées une par une)`)
+    let posees = 0
+    for (const ecriture of ecritures) {
+      const brouillon = await creerBrouillon(contexte, {
+        journalCode: ecriture.journalCode,
+        date: ecriture.date,
+        libelle: ecriture.libelle,
+        pieceRef: ecriture.pieceRef,
+        origine: ecriture.journalCode === 'AN' ? 'anouveaux' : 'import',
+        lines: ecriture.lines,
+      })
+      await validerEcriture(contexte, brouillon.id)
+      posees += 1
+      if (posees % 40 === 0) console.log(`   ${posees}/${ecritures.length}`)
+    }
+  }
+
   const comptes = await db.account.count({ where: { companyId: company.id } })
-  console.log(`\n✓ ${company.nom} — ${comptes} comptes, ${JOURNAUX.length} journaux, 2 exercices.`)
+  const validees = await db.entry.count({ where: { companyId: company.id, statut: 'validee' } })
+  console.log(
+    `\n✓ ${company.nom} — ${comptes} comptes, ${JOURNAUX.length} journaux, 2 exercices, ${validees} écritures validées.`,
+  )
 }
 
 main()

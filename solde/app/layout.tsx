@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import '@fontsource-variable/figtree'
 import '@fontsource-variable/geist-mono'
 import './globals.css'
+import { PaletteCommandes } from '@/components/palette/PaletteCommandes'
 
 export const metadata: Metadata = {
   title: 'SOLDE — la comptabilité qui se tient droite',
@@ -22,7 +23,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body>
+        {children}
+        <PaletteCommandes />
+      </body>
     </html>
   )
 }
