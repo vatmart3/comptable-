@@ -32,3 +32,24 @@ export function avancer(etat: EtatRessort, cible: number, delta: number): EtatRe
 export function auRepos(etat: EtatRessort, cible: number): boolean {
   return Math.abs(etat.valeur - cible) < 0.0005 && Math.abs(etat.vitesse) < 0.005
 }
+
+/** Angle maximal du fléau, en radians. Au-delà, la balance devient illisible. */
+export const ANGLE_MAX = 0.32
+
+/**
+ * Écart normalisé entre -1 et 1, positif quand le débit l'emporte.
+ *
+ * La normalisation est relative au plus gros plateau : un écart d'un centime
+ * sur 12 € doit se voir, le même centime sur 120 000 € ne doit pas coucher la
+ * balance. La racine carrée garde les petits écarts visibles tout en faisant
+ * saturer les gros — une balance qui touche la butée dit « déséquilibrée »,
+ * elle n'a pas à dire de combien.
+ */
+export function inclinaison(debit: number, credit: number): number {
+  const ecart = debit - credit
+  if (ecart === 0) return 0
+  const echelle = Math.max(debit, credit, 1)
+  const ratio = ecart / echelle
+  const signe = ratio < 0 ? -1 : 1
+  return signe * Math.min(1, Math.sqrt(Math.abs(ratio)))
+}

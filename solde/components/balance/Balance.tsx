@@ -14,7 +14,7 @@
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { formatAmount } from '@/lib/accounting/money'
-import { inclinaison } from './Balance3D'
+import { inclinaison } from './ressort'
 
 const Balance3D = dynamic(() => import('./Balance3D'), {
   ssr: false,

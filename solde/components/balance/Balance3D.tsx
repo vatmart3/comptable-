@@ -14,7 +14,7 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Group, Mesh, MeshStandardMaterial } from 'three'
-import { avancer, auRepos, type EtatRessort } from './ressort'
+import { ANGLE_MAX, auRepos, avancer, inclinaison, type EtatRessort } from './ressort'
 
 export interface BalanceProps {
   /** Total débit, en centimes. */
@@ -23,24 +23,6 @@ export interface BalanceProps {
   readonly credit: number
   /** Vrai quand il n'y a encore rien à peser. */
   readonly vide: boolean
-}
-
-/** Angle maximal du fléau, en radians. Au-delà, la balance devient illisible. */
-const ANGLE_MAX = 0.32
-
-/**
- * Écart normalisé entre -1 et 1. La normalisation est relative au plus gros
- * plateau : un écart d'un centime sur 12 € doit se voir, un écart d'un centime
- * sur 120 000 € ne doit pas coucher la balance.
- */
-export function inclinaison(debit: number, credit: number): number {
-  const ecart = debit - credit
-  if (ecart === 0) return 0
-  const echelle = Math.max(debit, credit, 1)
-  const ratio = ecart / echelle
-  // Racine : un petit écart reste visible, un gros écart sature vite.
-  const signe = ratio < 0 ? -1 : 1
-  return signe * Math.min(1, Math.sqrt(Math.abs(ratio)))
 }
 
 interface Teintes {
@@ -194,6 +176,8 @@ function Plateau({
     </group>
   )
 }
+
+export { inclinaison }
 
 export function Balance3D({ debit, credit, vide }: BalanceProps) {
   const [teintes, setTeintes] = useState<Teintes>(() => lireTeintes())

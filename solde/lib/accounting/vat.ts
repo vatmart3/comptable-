@@ -8,7 +8,6 @@
  * contrôle de cohérence, pas une erreur d'arrondi tolérée en silence.
  */
 
-import { z } from 'zod'
 import { applyRate, baseFromInclusive, roundHalfUp, type Cents, type RateMilliPct } from './money'
 
 /** Taux en vigueur en France métropolitaine, en millièmes de pourcent. */
@@ -299,10 +298,3 @@ export function ca3Entry(result: Ca3Result, libelle: string): Ca3EntryLine[] {
 export function ca3DueDate(periodeFin: Date): Date {
   return new Date(Date.UTC(periodeFin.getUTCFullYear(), periodeFin.getUTCMonth() + 1, 24))
 }
-
-export const vatPeriodSchema = z.object({
-  regime: z.enum(['CA3', 'CA12']),
-  periodeDebut: z.date(),
-  periodeFin: z.date(),
-  creditReporte: z.number().int().min(0).default(0),
-})
