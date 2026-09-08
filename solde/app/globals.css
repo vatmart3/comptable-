@@ -1,0 +1,180 @@
+@import 'tailwindcss';
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOLDE — tokens de design.
+   Rien n'est laissé aux valeurs par défaut de Tailwind : la palette, les
+   rayons, les durées et les ressorts sont nommés ici et nulle part ailleurs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* Couleurs — référencées via des variables sémantiques pour que le mode
+     nuit soit un changement de valeurs, pas un jeu de classes parallèle. */
+  --color-papier: var(--c-papier);
+  --color-papier-creux: var(--c-papier-creux);
+  --color-papier-haut: var(--c-papier-haut);
+  --color-encre: var(--c-encre);
+  --color-encre-douce: var(--c-encre-douce);
+  --color-trait: var(--c-trait);
+  --color-accent: var(--c-accent);
+  --color-graphite: var(--c-graphite);
+  --color-terre: var(--c-terre);
+  --color-vert-sourd: var(--c-vert-sourd);
+
+  /* Formes. Tout est rond, mais rond et net. */
+  --radius-carte: 28px;
+  --radius-champ: 16px;
+  --radius-pill: 999px;
+  --radius-perle: 8px;
+
+  /* Typographie. General Sans en tête : c'est la police du produit.
+     Figtree, auto-hébergée, prend le relais tant que General Sans n'est pas
+     déposée dans public/fonts — même squelette géométrique, terminaisons douces. */
+  --font-sans: 'General Sans', 'Figtree Variable', 'Figtree', system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+
+  /* Grille sur 4 px. */
+  --spacing: 4px;
+
+  /* Mouvement : des ressorts, jamais un ease-in-out par défaut. */
+  --ease-ressort: linear(
+    0, 0.006, 0.025, 0.101, 0.539, 0.815, 0.94, 1.001, 1.019, 1.014, 1.004, 0.999, 1
+  );
+  --duree-court: 180ms;
+  --duree-moyen: 320ms;
+  --duree-long: 520ms;
+}
+
+:root {
+  color-scheme: light;
+
+  --c-papier: #f7f5f1;
+  --c-papier-creux: #efede7;
+  --c-papier-haut: #fbfaf7;
+  --c-encre: #16150f;
+  --c-encre-douce: #6e6a5f;
+  --c-trait: #e2dfd6;
+  --c-accent: #0071e3;
+  --c-graphite: #3a3a38;
+  --c-terre: #c4553b;
+  --c-vert-sourd: #4a6b54;
+
+  /* Ressort de référence, repris à l'identique côté Motion
+     (stiffness 260, damping 30). */
+  --ressort-raideur: 260;
+  --ressort-amortissement: 30;
+}
+
+/* Mode nuit : encre sur graphite. Pas un dark slate bleuté générique. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='clair']) {
+    color-scheme: dark;
+
+    --c-papier: #141412;
+    --c-papier-creux: #1c1b18;
+    --c-papier-haut: #232220;
+    --c-encre: #edeae1;
+    --c-encre-douce: #9a958a;
+    --c-trait: #302e2a;
+    --c-accent: #4d9fff;
+    --c-graphite: #b9b5aa;
+    --c-terre: #d9705a;
+    --c-vert-sourd: #7ea88a;
+  }
+}
+
+:root[data-theme='nuit'] {
+  color-scheme: dark;
+
+  --c-papier: #141412;
+  --c-papier-creux: #1c1b18;
+  --c-papier-haut: #232220;
+  --c-encre: #edeae1;
+  --c-encre-douce: #9a958a;
+  --c-trait: #302e2a;
+  --c-accent: #4d9fff;
+  --c-graphite: #b9b5aa;
+  --c-terre: #d9705a;
+  --c-vert-sourd: #7ea88a;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--c-papier);
+    color: var(--c-encre);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv01';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Tous les chiffres du produit s'alignent au pixel. Sans exception. */
+  .chiffre,
+  input[inputmode='decimal'],
+  [data-numerique] {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+    letter-spacing: -0.01em;
+  }
+
+  /* Titre de section : capitales, tracking large, 11 px, encre douce. */
+  .surtitre {
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-encre-douce);
+  }
+
+  /* Focus dessiné, jamais l'outline du navigateur. */
+  :focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--c-papier),
+      0 0 0 4px var(--c-accent);
+    border-radius: var(--radius-champ);
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--c-accent) 22%, transparent);
+  }
+
+  /* Rien ne bouge pour qui a demandé que rien ne bouge : la balance devient
+     statique, Le Fil devient une liste. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Une carte se distingue par un filet, pas par une ombre molle. */
+  .carte {
+    background-color: var(--c-papier-haut);
+    border: 1px solid var(--c-trait);
+    border-radius: var(--radius-carte);
+    padding: 24px;
+  }
+
+  .carte-creuse {
+    background-color: var(--c-papier-creux);
+    border: 1px solid transparent;
+    border-radius: var(--radius-carte);
+    padding: 24px;
+  }
+
+  .filet {
+    border: 0;
+    border-top: 1px solid var(--c-trait);
+  }
+}
